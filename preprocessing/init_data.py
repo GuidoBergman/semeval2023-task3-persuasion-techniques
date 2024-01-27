@@ -19,6 +19,25 @@ sys.path.append('..')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('init_data')
 
+def get_new_labels(old_labels):
+    manipulative_wordding = ['Exaggeration-Minimisation',  'Obfuscation-Vagueness-Confusion', 'Repetition', 'Loaded_Language']
+    attack_on_reputation = ['Appeal_to_Hypocrisy', 'Guilt_by_Association',  'Name_Calling-Labeling',  'Questioning_the_Reputation', 'Doubt']
+
+    new_labels = set()
+
+    for old_label in old_labels:
+        if old_label in manipulative_wordding:
+            new_labels.add('Manipulative_Wordding')
+
+        if old_label in attack_on_reputation:
+            new_labels.add('Attack_on_Reputation')
+
+    if len(new_labels) == 0:
+        new_labels.add('')
+
+    new_labels = list(new_labels)
+
+    return new_labels
 
 def init_raw_data(train_set=True, dev_set=True, test_set=True) -> Tuple[Dict[int, Line], Dict[int, Article]]:
     path = '_input_data/data'
@@ -67,12 +86,15 @@ def init_raw_data(train_set=True, dev_set=True, test_set=True) -> Tuple[Dict[int
                         language,
                         label_file=label_file
                     )
+                else:
+                    logger.error(f'The file {line_file} does not exist')
 
     """
     Assign labels where appropriate
     """
     labels_dict = {(l[0],l[1]):l[2] for l in labels}
     sentences = [(*s, labels_dict.get((s[0], s[1]), 'unknown').split(',')) for s in sentences] # test set will have unknown labels
+    sentences = [(s[0], s[1], s[2], s[3], get_new_labels(s[4])) for s in sentences] # Get only ManipulativeWording and Attack on Reputation labels
 
     # convert to namedtuple
     sentences = [Line(*s) for s in sentences]
