@@ -135,15 +135,18 @@ def load_dataframe(args):
         mappings = one_hot.classes_[1:]
     else:
         print('No targets to create one-hot-encodings from! Loading from pre-set list instead...\n')
-        mappings = np.array(['Appeal_to_Authority', 'Appeal_to_Fear-Prejudice', 'Appeal_to_Hypocrisy',
-                             'Appeal_to_Popularity', 'Appeal_to_Time', 'Appeal_to_Values',
-                             'Causal_Oversimplification', 'Consequential_Oversimplification',
-                             'Conversation_Killer', 'Doubt', 'Exaggeration-Minimisation',
-                             'False_Dilemma-No_Choice', 'Flag_Waving', 'Guilt_by_Association',
-                             'Loaded_Language', 'Name_Calling-Labeling',
-                             'Obfuscation-Vagueness-Confusion', 'Questioning_the_Reputation',
-                             'Red_Herring', 'Repetition', 'Slogans', 'Straw_Man', 'Whataboutism'
-                             ])
+
+        # mappings = np.array(['Appeal_to_Authority', 'Appeal_to_Fear-Prejudice', 'Appeal_to_Hypocrisy',
+        #                      'Appeal_to_Popularity', 'Appeal_to_Time', 'Appeal_to_Values',
+        #                      'Causal_Oversimplification', 'Consequential_Oversimplification',
+        #                      'Conversation_Killer', 'Doubt', 'Exaggeration-Minimisation',
+        #                      'False_Dilemma-No_Choice', 'Flag_Waving', 'Guilt_by_Association',
+        #                      'Loaded_Language', 'Name_Calling-Labeling',
+        #                      'Obfuscation-Vagueness-Confusion', 'Questioning_the_Reputation',
+        #                      'Red_Herring', 'Repetition', 'Slogans', 'Straw_Man', 'Whataboutism'
+        #                      ])
+        mappings = np.array(['Attack_on_Reputation', 'Manipulative_Wordding'])
+
     return test_df, mappings
 
 def create_dataloader(args, test_df, language, language_counts):
