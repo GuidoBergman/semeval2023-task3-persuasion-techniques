@@ -1,7 +1,7 @@
 advertools
 google-cloud-translate
-pytorch
 numpy
 pandas
+torch
 scikit-learn
 transformers
