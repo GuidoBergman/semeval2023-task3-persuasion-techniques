@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 def test(model, testing_loader, only_test):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(f'Model cofig: {self.model.cofig}')
     model.eval()
     fin_targets = []
     fin_outputs = []
