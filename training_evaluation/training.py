@@ -79,7 +79,7 @@ class LanguageModel:
         print(f'\nNow training on Epoch {epoch}.')
         print(
             f'Testing on {len(self.training_loader) * self.training_loader.batch_size - 1} data points (around {len(self.training_loader)} iterations)')
-        print(f'Model cofig: {self.model.cofig}')
+        print(f'Model cofig: {self.model.config}')
 
         self.args['CURRENT_TRAIN_LOSS'] = 0
         self.model.train()
