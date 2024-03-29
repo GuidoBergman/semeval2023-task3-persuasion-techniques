@@ -12,7 +12,6 @@ from tqdm import tqdm
 
 def test(model, testing_loader, only_test):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f'Model cofig: {model.config}')
     model.eval()
     fin_targets = []
     fin_outputs = []
@@ -61,8 +60,14 @@ def create_submission_txt(outputs, df, path, mappings):
 
 def run_eval(args):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model = torch.load(args["MODEL_FILE_NAME"])
+    model = torch.load(args["MODEL_FILE_NAME"], map_location=torch.device(device))
     model.to(device)
+    # Print the model architecture
+    print(model)
+
+    # If you want to print the parameters of the model
+    for name, param in model.named_parameters():
+        print(f"Parameter: {name}, Size: {param.size()}")
 
     test_df, mappings = load_dataframe(args)
     language_counts = Counter(test_df.language)
