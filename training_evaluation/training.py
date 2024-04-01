@@ -1,4 +1,4 @@
-from training_evaluation.models import BERTBase, EnglishRobertaBase, EnglishRobertaLarge, mBERTBase, XLMRobertaBase, XLMRobertaLarge
+from training_evaluation.models import BERTBase, EnglishRobertaBase, EnglishRobertaLarge, mBERTBase, XLMRobertaBase, XLMRobertaLarge, XLMRobertaBaseForTokenClassification, XLMRobertaLargeForTokenClassification, COUNT_TECHNIQUES
 from torch.utils.data import DataLoader
 import torch
 from training_evaluation.model_data_preparation import create_dataset_training
@@ -51,9 +51,15 @@ class LanguageModel:
         elif args['MODEL_NAME'] == 'bert-base-multilingual-cased':
             self.model = mBERTBase()
         elif args['MODEL_NAME'] == 'xlm-roberta-base':
-            self.model = XLMRobertaBase()
+            if args['TOKEN_CLASSIFICATION']:
+                self.model = XLMRobertaBaseForTokenClassification()
+            else:
+                self.model = XLMRobertaBase()
         elif args['MODEL_NAME'] == 'xlm-roberta-large':
-            self.model = XLMRobertaLarge()
+            if args['TOKEN_CLASSIFICATION']:
+                self.model = XLMRobertaLargeForTokenClassification()
+            else:
+                self.model = XLMRobertaLarge()
 
         self.model.to(self.device)
         self.optimizer = torch.optim.Adam(params=self.model.parameters(), lr=self.args['LEARNING_RATE'])
@@ -79,7 +85,7 @@ class LanguageModel:
         print(f'\nNow training on Epoch {epoch}.')
         print(
             f'Testing on {len(self.training_loader) * self.training_loader.batch_size - 1} data points (around {len(self.training_loader)} iterations)')
-        print(f'Model cofig: {self.model.config}')
+
 
         self.args['CURRENT_TRAIN_LOSS'] = 0
         self.model.train()
@@ -91,7 +97,14 @@ class LanguageModel:
 
             outputs = self.model(ids, mask, token_type_ids)
 
-            loss = torch.nn.BCEWithLogitsLoss()(outputs, targets)
+            if self.args['TOKEN_CLASSIFICATION']:
+                # this accesses predictions for tokens that aren't CLS, PAD, or the 2nd+ subword in a word
+                # and simultaneously flattens the logits or labels (https://discuss.huggingface.co/t/multi-label-token-classification/16509/13)
+                flat_outputs = outputs.logits[targets != -100]
+                flat_labels = targets[targets != -100]
+                loss = torch.nn.BCEWithLogitsLoss()(flat_outputs, flat_labels)
+            else:
+                loss = torch.nn.BCEWithLogitsLoss()(outputs, targets)
             if itr % 200 == 0:
                 print(f'Epoch: {epoch}, Training Loss:  {loss.item()}')
 
